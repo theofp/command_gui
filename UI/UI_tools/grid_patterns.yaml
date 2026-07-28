@@ -1,0 +1,46 @@
+# For much later when i get to autogenerating UIs from files
+default : 
+
+  text :
+    columnspan : 2
+    rowspan : 1
+    height : 5
+    sticky : "ew"
+    padx : 5
+    pady : 5
+
+  smart_text :
+    columnspan : 2
+    rowspan : 2
+    height : 5
+    sticky : "ew"
+    padx : 5
+    pady : 5
+
+  button :
+    columnspan : 1
+    rowspan : 1
+    sticky : "ew"
+    padx : 5
+    pady : 5
+  
+  label :
+    columnspan : 1
+    rowspan : 1
+    sticky : "ew"
+    padx : 5
+    pady : 5
+
+  labelandentry :
+    columnspan : 2
+    rowspan : 1
+    sticky : "ew"
+    padx : 5
+    pady : 5
+
+  labelandtext :
+    columnspan : 2
+    rowspan : 2
+    sticky : "ew"
+    padx : 5
+    pady : 5
