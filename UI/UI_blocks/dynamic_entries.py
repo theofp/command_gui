@@ -309,9 +309,12 @@ class DynamicNumberEntry(tk.Entry):
         if validator is not None:
             self.validator = validator
             self.is_validator_bound = True
-            self.bind("<KeyPress>", self.field_validation)
+            self.bind("<KeyPress>", self.field_validation_delay_wrapper(event=None, validator=None, color=None))
             self.bind("<FocusIn>", lambda : self.highlight(event_type = "focus"))
             self.bind("<FocusOut>", lambda : self.highlight(event_type = "unfocus"))
+
+    def field_validation_delay_wrapper(self, event : tk.Event, validator : Callable[[str],bool] = None, color : str = "red"):
+        self.after(50, lambda : self.field_validation(event, validator = validator, color = color))
 
     def field_validation(self, event : tk.Event, validator : Callable[[str],bool] = None, color : str = "red"):
 
@@ -320,7 +323,7 @@ class DynamicNumberEntry(tk.Entry):
         elif validator is None and not self.is_validator_bound:
             print("No validator bound to this object")
             return
-            # This should be an exception (handled by an)
+            # This should be an exception (handled by an) # an what?
 
         entry = self.get()
         typeset_entry = self.typeset(entry)
@@ -329,6 +332,7 @@ class DynamicNumberEntry(tk.Entry):
 
             self.field_value = typeset_entry
             self.highlight(color = "white", event_type = "unhighlight")
+            self.is_border_red = False
         else:
             self.is_border_red = True
             self.highlight(color = color)
@@ -372,3 +376,7 @@ class DynamicNumberEntry(tk.Entry):
 
         if event_type == "unhighlight":
             self.config(highlightbackground="white", highlightcolor="white", highlightthickness=0)
+
+    def set_text(self, text):
+        self.delete(0, tk.END)
+        self.insert(0, f"{float(text):.3f}")
