@@ -301,6 +301,7 @@ class DynamicNumberEntry(tk.Entry):
     is_border_red : bool = False   
     is_validator_bound : bool = False 
     id = None
+    is_protected = False
 
     def __init__(self, root, text_dimensions = 50, validator : Callable[[str],bool] = None ,*args, **kwargs):
         super().__init__(root, width = text_dimensions, *args, **kwargs)
@@ -309,14 +310,14 @@ class DynamicNumberEntry(tk.Entry):
         if validator is not None:
             self.validator = validator
             self.is_validator_bound = True
-            self.bind("<KeyPress>", self.field_validation_delay_wrapper(event=None, validator=None, color=None))
+            self.bind("<KeyPress>", self.field_validation_delay_wrapper)
             self.bind("<FocusIn>", lambda : self.highlight(event_type = "focus"))
             self.bind("<FocusOut>", lambda : self.highlight(event_type = "unfocus"))
 
     def field_validation_delay_wrapper(self, event : tk.Event, validator : Callable[[str],bool] = None, color : str = "red"):
         self.after(50, lambda : self.field_validation(event, validator = validator, color = color))
 
-    def field_validation(self, event : tk.Event, validator : Callable[[str],bool] = None, color : str = "red"):
+    def field_validation(self, event : tk.Event = None, validator : Callable[[str],bool] = None, color : str = "red"):
 
         if validator is None and self.is_validator_bound:
             validator = self.validator
@@ -326,7 +327,7 @@ class DynamicNumberEntry(tk.Entry):
             # This should be an exception (handled by an) # an what?
 
         entry = self.get()
-        typeset_entry = self.typeset(entry)
+        typeset_entry = entry #self.typeset(entry)
 
         if validator(typeset_entry):
 
@@ -342,9 +343,9 @@ class DynamicNumberEntry(tk.Entry):
     def set_validator(self, validator : Callable[[str], bool]):
         self.validator = validator
         self.is_validator_bound = True
-        self.bind("<KeyPress>", self.field_validation)
-        self.bind("<FocusIn>", lambda : self.highlight(event_type = "focus"))
-        self.bind("<FocusOut>", lambda : self.highlight(event_type = "unfocus"))
+        self.bind("<KeyPress>", lambda event: self.field_validation_delay_wrapper(event = event))
+        self.bind("<FocusIn>", lambda event: self.highlight(event_type = "focus"))
+        self.bind("<FocusOut>", lambda event: self.highlight(event_type = "unfocus"))
 
 
     def typeset(self, entry : str, no_nums : bool = False)->str:
@@ -370,12 +371,20 @@ class DynamicNumberEntry(tk.Entry):
 
         if event_type == "focus":
             self.config(highlightthickness=2)
+            self.is_protected = True
 
         if event_type == "unfocus":
             self.config(highlightthickness=1)
+            self.is_protected = False
 
         if event_type == "unhighlight":
             self.config(highlightbackground="white", highlightcolor="white", highlightthickness=0)
+
+    def set_text_wrapper(self, text):
+        if self.is_protected:
+            return
+        else:
+            self.set_text(text=text)
 
     def set_text(self, text):
         self.delete(0, tk.END)

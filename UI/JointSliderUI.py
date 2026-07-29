@@ -8,9 +8,7 @@ class JointSliderUI(tk.Frame):
     n_sliders = 5
     pi = 3.1415
     pi2 = pi/2
-    sliders = list() # Tk.Scale objects
-    labels = list()  # Tk.Label objects
-    entries = list() # UI.DynamicEntry objects
+
 
     slider_labels_txt = [
         "theta 1 (shoulder)",
@@ -24,6 +22,10 @@ class JointSliderUI(tk.Frame):
 
     def __init__(self, root : tk.Tk):
 
+        self.sliders = [] # Tk.Scale objects
+        self.labels = []  # Tk.Label objects
+        self.entries = [] # UI.DynamicEntry objects
+
         super().__init__(master = root)
         self.root = root
 
@@ -33,8 +35,9 @@ class JointSliderUI(tk.Frame):
                 self.root,
                 from_= self.l_bound[i],
                 to=self.u_bound[i],
-                orient=tk.HORIZONTAL
-                command=lambda value, index = i, self.slider_callback(index,value)
+                orient=tk.HORIZONTAL,
+                command=lambda value, index = i: self.slider_callback(index,value),
+                resolution=0.001
             )
             s.id = i
             s.parent = self
@@ -48,20 +51,20 @@ class JointSliderUI(tk.Frame):
 
             e = DynamicNumberEntry(root=self.root)
             e.id = i
+            e.config(width=10)
 
-            def validator(value, lower=self.l_bound[i], upper=self.u_bound[i], id = i):
+            def validator_(value, lower=self.l_bound[i], upper=self.u_bound[i], id = i):
                 try:
                     x = float(value)
                 except ValueError:
                     return False
-
                 queerie = (lower <= x <= upper)
                 if queerie:
                     self.sliders[id].set(x) # this might not work though given how python is run it should
 
                 return queerie
 
-            e.set_validator(validator)
+            e.set_validator(validator = validator_)
 
             self.sliders.append(s)
             self.labels.append(l)
@@ -80,7 +83,7 @@ class JointSliderUI(tk.Frame):
             s.grid(
                 row=row + 1,
                 column=0,
-                sticky="ew",
+                sticky="w",
                 padx=10,
                 pady=(0, 10)
             )
@@ -103,7 +106,7 @@ class JointSliderUI(tk.Frame):
         return out
 
     def slider_callback(self, index, value):
-        self.entries[index].set_text(value)
+        self.entries[index].set_text_wrapper(value)
 
 
 
