@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             "joint_sliders = command_gui.JointSliders:main"
+            "main_menu = command_gui.MainMenu:main"
         ],
     },
 )

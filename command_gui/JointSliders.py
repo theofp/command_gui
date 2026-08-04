@@ -11,6 +11,7 @@ class JointSliderNode(Node):
     window : tk.Tk = None 
 
     def __init__(self, name : str = 'JointSlider'):
+
         super().__init__(name)
         self.window = tk.Tk()
         self.window.title("Barebones UI")
@@ -24,12 +25,17 @@ class JointSliderNode(Node):
             self.timer_callback
         )
 
+        self.UI.pack(fill=tk.BOTH, expand=True)
+
     def timer_callback(self):
+
         self.window.update()
         out = self.UI.get_slider_values()
         pub = Float32MultiArray()
+
         for i in range(len(out)):
             pub.data.append(out[i])
+
         self.publisher.publish(pub)
 
 

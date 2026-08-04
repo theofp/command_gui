@@ -8,6 +8,7 @@ class JointSliderUI(tk.Frame):
     n_sliders = 5
     pi = 3.1415
     pi2 = pi/2
+    deletable = False
 
 
     slider_labels_txt = [
@@ -32,7 +33,7 @@ class JointSliderUI(tk.Frame):
         for i in range(5):
 
             s = tk.Scale(
-                self.root,
+                self,
                 from_= self.l_bound[i],
                 to=self.u_bound[i],
                 orient=tk.HORIZONTAL,
@@ -43,13 +44,13 @@ class JointSliderUI(tk.Frame):
             s.parent = self
 
             l = tk.Label(
-                self.root,
+                self,
                 text=self.slider_labels_txt[i]
                 )
             l.id = i
             l.parent = self
 
-            e = DynamicNumberEntry(root=self.root)
+            e = DynamicNumberEntry(root = self)
             e.id = i
             e.config(width=10)
 
@@ -97,6 +98,14 @@ class JointSliderUI(tk.Frame):
 
 
         self.columnconfigure(0, weight=1)
+
+        self.ReturnButton = tk.Button(
+            text="Return", 
+            font=("Arial", 12),
+            command=self.button_callback)
+
+    def button_callback(self):
+        self.deletable = True
 
     def get_slider_values(self):
 
