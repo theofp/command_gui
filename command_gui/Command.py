@@ -1,7 +1,8 @@
+import rclpy
 import tkinter as tk
-from rclpy import Node
+from rclpy.node import Node
 from UI.CommandUIBlocks import MainMenu
-import motion_msgs.msg.Command as Command
+from motion_msgs.msg import Command
 
 
 class CommandNode(Node):
@@ -17,16 +18,14 @@ class CommandNode(Node):
 
     #cmd tuple
 
-    cmd : tuple = None
-
     def __init__(self, *args, **kwargs):
 
         super().__init__("CommandGUI")
         self.window = tk.Tk()
         self.window.title("Barebones UI")
-        self.window.geometry("300x500")
+        self.window.geometry("900x600")
 
-        self.menu = MainMenu(root = self.window)
+        self.menu = MainMenu(self.window)
 
         self.command_publisher = self.create_publisher(
             Command,
@@ -35,7 +34,7 @@ class CommandNode(Node):
 
         self.timer = self.create_timer(
             0.1,
-            self.timer_callback()
+            self.timer_callback
         )
 
     def timer_callback(self): # hijacked the update loop!
@@ -47,22 +46,17 @@ class CommandNode(Node):
         if self.menu.is_command_available:
             cmd = self.menu.cmd
             self.command_publisher.publish(cmd)
+            self.menu.is_command_available = False
         pass
 
-    def preset_command(self):
+def main(*args, **kwargs):
 
-        self.cmd.command_type = "default"
-        self.cmd.target_xyz = {0,0,0}
-        self.cmd.target = {0,0,0,0,0}
-        self.cmd.time = 0.0 # s
-        self.cmd.movement_type = "4D"
-        self.cmd.is_approach_given = False
-        self.cmd.Approach4D = 0.0
-        self.cmd.Approach5D = {0,0}
-        self.cmd.PathName = "default"
+    rclpy.init()
 
-        return
+    node = CommandNode()
+    rclpy.spin(node)
 
-
+    node.destroy_node()
+    rclpy.shutdown()
 
         

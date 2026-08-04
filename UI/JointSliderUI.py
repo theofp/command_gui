@@ -9,6 +9,7 @@ class JointSliderUI(tk.Frame):
     pi = 3.1415
     pi2 = pi/2
     deletable = False
+    is_command_available : bool = False
 
 
     slider_labels_txt = [
@@ -98,14 +99,6 @@ class JointSliderUI(tk.Frame):
 
 
         self.columnconfigure(0, weight=1)
-
-        self.ReturnButton = tk.Button(
-            text="Return", 
-            font=("Arial", 12),
-            command=self.button_callback)
-
-    def button_callback(self):
-        self.deletable = True
 
     def get_slider_values(self):
 
