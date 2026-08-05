@@ -55,7 +55,6 @@ class CommandUITargetXYZ(tk.Frame):
             self.entries.append(e)
             self.labels.append(l)
 
-
 class CommandUITarget(tk.Frame):
 
     root : tk.Tk = None
@@ -139,9 +138,11 @@ class MainMenu():
 
     is_command_available : bool = False
 
+    type_dict : dict 
+
     # Misc
     root : tk.Tk = None
-    cmd : Command = None
+    cmd : Command = Command()
 
     def __init__(self, root):
 
@@ -214,6 +215,8 @@ class MainMenu():
         self.MiscButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         self.JointSliderButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
+        self.MenuGUI.is_command_available = False
+
     def build(self):
 
         if self.is_menu_active:
@@ -244,6 +247,7 @@ class MainMenu():
         self.forget_all_frames()
         self.is_menu_active = True
         self.MenuGUI.pack(fill=tk.BOTH, expand=True)
+        self.active_frame = self.MenuGUI
 
     def show_target_xyz_ui(self):
 
@@ -251,6 +255,8 @@ class MainMenu():
         self.is_target_xyz_ui_active = True
         self.TargetXYZUI.pack(fill=tk.BOTH, expand=True)
         self.MainMenuButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.PublishButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.active_frame = self.TargetXYZUI
 
     def show_target_ui(self):
 
@@ -258,6 +264,8 @@ class MainMenu():
         self.is_target_ui_active = True
         self.TargetUI.pack(fill=tk.BOTH, expand=True)
         self.MainMenuButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.PublishButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.active_frame = self.TargetUI
 
     def show_misc_ui(self):
 
@@ -265,6 +273,8 @@ class MainMenu():
         self.is_misc_ui_active = True
         self.MiscUI.pack(fill=tk.BOTH, expand=True)
         self.MainMenuButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.PublishButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.active_frame = self.MiscUI
 
     def show_joint_slider_ui(self):
 
@@ -272,6 +282,8 @@ class MainMenu():
         self.is_joint_slider_ui_active = True
         self.JointSliderUI_.pack(fill=tk.BOTH, expand=True)
         self.MainMenuButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.PublishButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.active_frame = self.JointSliderUI_
 
     def forget_all_frames(self):
 
@@ -288,60 +300,68 @@ class MainMenu():
         self.TargetUI.pack_forget()
         self.MiscUI.pack_forget()
         self.JointSliderUI_.pack_forget()
+        self.PublishButton.pack_forget()
 
-    def update_menu(self):
-        if self.is_target_xyz_ui_active:
-            self.is_command_available = True
-            self.buid_command_TargetXYZ()
-            return
+    def update_menu(self): ### Could be made more beautiful with a dictionary of methods
 
-        if self.is_target_ui_active:
-            self.is_command_available = True
-            self.buid_command_Target()
-            return
+        if not self.active_frame.is_command_available:
 
-        if self.is_misc_ui_active:
-            self.is_command_available = True
-            self.buid_command_Misc()
-            return
-
-        if self.is_joint_slider_ui_active:
-            self.is_command_available = True
-            self.buid_command_JointSlider()
-            return
-
-        else:
             self.is_command_available = False
+            return
 
-    def buid_command_TargetXYZ(self):
+        if self.active_frame == self.TargetXYZUI:
+            
+            self.is_command_available = True
+            self.build_command_TargetXYZ()
+            return
+
+        if self.active_frame == self.TargetUI:
+
+            self.is_command_available = True
+            self.build_command_Target()
+            return
+
+        if self.active_frame == self.MiscUI:
+
+            self.is_command_available = True
+            self.build_command_Misc()
+            return
+
+        if self.active_frame == self.JointSliderUI_:
+
+            self.is_command_available = True
+            self.build_command_JointSlider()
+            return
+
+    def build_command_TargetXYZ(self):
 
         self.preset_command()
         self.cmd.command_type = "GoToXYZ"
         self.cmd.target_xyz = [
-            float(self.TargetXYZUI.entries[0].get()),
-            float(self.TargetXYZUI.entries[1].get()),
-            float(self.TargetXYZUI.entries[2].get())
+            float(self.TargetXYZUI.entries[0].field_value),
+            float(self.TargetXYZUI.entries[1].field_value),
+            float(self.TargetXYZUI.entries[2].field_value)
         ]
         self.cmd.movement_type = "4D"
-        self.cmd.isapproach_given = False
+        self.cmd.is_approach_given = False
 
         self.TargetXYZUI.is_command_available = False
 
-    def buid_command_Target(self):
+    def build_command_Target(self):
 
         self.preset_command()
         self.cmd.command_type = "GoToTarget"
         self.cmd.target = [
-            float(self.TargetUI.entries[0].get()),
-            float(self.TargetUI.entries[1].get()),
-            float(self.TargetUI.entries[2].get()),
-            float(self.TargetUI.entries[3].get()),
-            float(self.TargetUI.entries[4].get())
+            float(self.TargetUI.entries[0].field_value),
+            float(self.TargetUI.entries[1].field_value),
+            float(self.TargetUI.entries[2].field_value),
+            float(self.TargetUI.entries[3].field_value),
+            float(self.TargetUI.entries[4].field_value)
         ]
 
         self.TargetUI.is_command_available = False
 
-    def buid_command_Misc(self):
+    def build_command_Misc(self):
 
         self.preset_command()
         self.cmd.command_type = "Misc"
@@ -349,7 +369,7 @@ class MainMenu():
 
         self.MiscUI.is_command_available = False
 
-    def buid_command_JointSlider(self):
+    def build_command_JointSlider(self):
 
         self.preset_command()
         self.cmd.command_type = "GoTo"
@@ -371,7 +391,7 @@ class MainMenu():
 
         return self.cmd
 
-    def publish_pipeline_start(self): # this allows the publication of garbage to be refactored
+    def publish_pipeline_start(self): # this allows the publication of garbage (maybe not with the internal validators)
         if self.active_frame == self.MenuGUI:
             print("No command to publish, please select a command type")
             return

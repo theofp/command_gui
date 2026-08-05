@@ -26,10 +26,11 @@ class CommandNode(Node):
         self.window.geometry("900x600")
 
         self.menu = MainMenu(self.window)
+        self.is_alive = True
 
         self.command_publisher = self.create_publisher(
             Command,
-            "temp_topic",
+            "UI_command",
             10)
 
         self.timer = self.create_timer(
@@ -38,15 +39,23 @@ class CommandNode(Node):
         )
 
     def timer_callback(self): # hijacked the update loop!
+
         self.window.update()
         self.menu.update_menu()
         self.checkPublishStatus()
 
+        # This does not work when the window is closed but ironically that makes it throw an error that leads to killing the process
+        if not self.window.winfo_exists(): 
+            self.is_alive = False
+
     def checkPublishStatus(self):
+
         if self.menu.is_command_available:
+
             cmd = self.menu.cmd
             self.command_publisher.publish(cmd)
             self.menu.is_command_available = False
+
         pass
 
 def main(*args, **kwargs):
@@ -54,7 +63,9 @@ def main(*args, **kwargs):
     rclpy.init()
 
     node = CommandNode()
-    rclpy.spin(node)
+
+    while node.is_alive:
+        rclpy.spin_once(node)
 
     node.destroy_node()
     rclpy.shutdown()

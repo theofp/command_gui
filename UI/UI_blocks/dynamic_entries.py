@@ -297,7 +297,7 @@ class DynamicNumberEntry(tk.Entry):
     
     validator : Callable[[str],bool] = None
     no_nums : bool = False
-    field_value : Any = None
+    field_value : float = None
     is_border_red : bool = False   
     is_validator_bound : bool = False 
     id = None
