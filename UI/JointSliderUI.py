@@ -110,14 +110,3 @@ class JointSliderUI(tk.Frame):
     def slider_callback(self, index, value):
         self.entries[index].set_text_wrapper(value)
 
-
-
-#+----------------------+---------+
-#| theta 1 (shoulder)   |         |
-#| [-----slider------]  | [entry] |
-#+----------------------+---------+
-#
-#+----------------------+---------+
-#| theta 2 (shoulder)   |         |
-#| [-----slider------]  | [entry] |
-#+----------------------+---------+

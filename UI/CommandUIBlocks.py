@@ -1,9 +1,13 @@
 import tkinter as tk
+from tkinter import ttk
 from UI.UI_blocks.dynamic_entries import DynamicNumberEntry
 from UI.UI_tools.field_validators import *
 from UI.JointSliderUI import JointSliderUI
 from motion_msgs.msg import Command
-
+from motion_msgs.msg import Movement
+from motion_msgs.msg import Misc
+from motion_msgs.msg import Trajectory
+from UI.UI_tools.CommandEnums import *
 
 
 class CommandUITargetXYZ(tk.Frame):
@@ -11,6 +15,12 @@ class CommandUITargetXYZ(tk.Frame):
     root : tk.Tk = None
 
     is_command_available : bool = False
+
+    pi = 3.1415
+    pi2 = pi/2
+
+    u_bound = [ pi/3,  pi/3]
+    l_bound = [-pi/3, -pi/3]
 
     entry_labels = [
         "X",
@@ -26,6 +36,42 @@ class CommandUITargetXYZ(tk.Frame):
         self.entries = [] # UI.DynamicEntry objects
         self.labels = []  # Tk.Label objects
 
+        self.movement_type = ttk.Combobox(
+            self,
+            values=[x.name for x in MovementType],
+            state="readonly"
+        )
+
+        self.param_entry_1 = DynamicNumberEntry(root=self)
+
+        def validator_(value, lower=self.l_bound[0], upper=self.u_bound[0]):
+            try:
+                x = float(value)
+            except ValueError:
+                return False
+            queerie = (lower <= x <= upper)
+            return queerie
+
+        self.param_entry_1.set_validator(validator = validator_)
+
+        self.param_entry_1.delete(0, tk.END)
+        self.param_entry_1.insert(0, "0.0")
+
+        self.param_entry_2 = DynamicNumberEntry(root=self)
+
+        def validator_(value, lower=self.l_bound[1], upper=self.u_bound[1]):
+            try:
+                x = float(value)
+            except ValueError:
+                return False
+            queerie = (lower <= x <= upper)
+            return queerie
+
+        self.param_entry_2.set_validator(validator = validator_)
+
+        self.param_entry_2.delete(0, tk.END)
+        self.param_entry_2.insert(0, "0.0")
+        
         for i in range(3):
 
             l = tk.Label(
@@ -54,6 +100,10 @@ class CommandUITargetXYZ(tk.Frame):
 
             self.entries.append(e)
             self.labels.append(l)
+
+        self.movement_type.grid(row = 0, column = 2, columnspan=1, sticky="ew", padx=10, pady=10)
+        self.param_entry_1.grid(row = 1, column = 2, columnspan=1, sticky="ew", padx=10, pady=10)
+        self.param_entry_2.grid(row = 2, column = 2, columnspan=1, sticky="ew", padx=10, pady=10)
 
 class CommandUITarget(tk.Frame):
 
@@ -117,13 +167,68 @@ class MiscCommandUI(tk.Frame):
 
     is_command_available : bool = False
 
+    misc_type : ttk.Combobox = None
+    misc_type_label : tk.Label = None
+    misc_param_entry : DynamicNumberEntry = None
+
+    root : tk.Tk = None
+
     def __init__(self, root):
-        super().__init__(root)
+        super().__init__()
+
+        self.root = root
+        self.is_command_available = False
+
+        self.misc_type = ttk.Combobox(
+            self,
+            values=[x.name for x in MiscType],
+            state="readonly"
+        )
+
+        self.misc_type.bind(
+            "<<ComboboxSelected>>",
+            self.misc_type_selected
+        )
+
+        self.misc_type_label = tk.Label(
+            self,
+            text="Undefined"
+        )
+
+        self.misc_param_entry = DynamicNumberEntry(root=self)
+
+        def validator_(value):
+            try:
+                x = float(value)
+            except ValueError:
+                return False
+            return float(value) >= 0.0
+
+        self.misc_param_entry.set_validator(validator = validator_)
+
+        self.misc_type.grid(row = 0, column = 0, sticky="ew", padx=10, pady=10)
+        self.misc_type_label.grid(row = 0, column = 1, sticky="ew", padx=10, pady=10)
+        self.misc_param_entry.grid(row = 1, column = 1, sticky="ew", padx=10, pady=10)
+
+
+    def misc_type_selected(self, event):
+
+        cmd_type = self.misc_type.get()
+
+        if (cmd_type == "Wait" or cmd_type == "WaitAndResume"):
+
+            self.misc_type_label.config(text="Time (seconds) \n  Must be positive")
+            self.misc_param_entry.config(state="normal")
+
+        else:
+            self.misc_type_label.config(text="Inactive Entry")
+            self.misc_param_entry.config(state="disabled")
     # Wait commands et cetera 
 
 class MainMenu():
 
     # Buttons
+
     TargetXYZButton : tk.Button = None
     TargetButton : tk.Button = None
     MiscButton : tk.Button = None
@@ -131,6 +236,7 @@ class MainMenu():
     MainMenuButton : tk.Button = None
     
     # Frames
+
     TargetXYZUI : CommandUITargetXYZ = None
     TargetUI : CommandUITarget = None
     MiscUI : MiscCommandUI = None
@@ -179,6 +285,8 @@ class MainMenu():
         )
 
         self.build()
+
+    # UI preparation method
 
     def setupMenuGUI(self):
 
@@ -242,6 +350,8 @@ class MainMenu():
             print("No UI is active, nothing to build")
             return      
 
+    # UI Update methods
+
     def show_menu_gui(self):
 
         self.forget_all_frames()
@@ -302,6 +412,75 @@ class MainMenu():
         self.JointSliderUI_.pack_forget()
         self.PublishButton.pack_forget()
 
+    # Command Builders
+
+    def build_command_TargetXYZ(self):
+
+        self.preset_command()
+        self.cmd.type = CommandType.Movement
+        self.cmd.motion.type = MovementType.GoToXYZ
+        self.cmd.motion = Movement()
+
+        self.cmd.motion.target_xyz = [
+            float(self.TargetXYZUI.entries[0].field_value),
+            float(self.TargetXYZUI.entries[1].field_value),
+            float(self.TargetXYZUI.entries[2].field_value)
+        ]
+
+        self.cmd.solver_type = SolverType[self.TargetXYZUI.movement_type.get()]
+
+        self.TargetXYZUI.is_command_available = False
+
+    def build_command_Target(self):
+
+        self.preset_command()
+        self.cmd.type = CommandType.Movement
+        self.cmd.motion = Movement()
+        self.cmd.motion.type = MovementType.GoTo
+
+        self.cmd.motion.target = [
+            float(self.TargetUI.entries[0].field_value),
+            float(self.TargetUI.entries[1].field_value),
+            float(self.TargetUI.entries[2].field_value),
+            float(self.TargetUI.entries[3].field_value),
+            float(self.TargetUI.entries[4].field_value)
+        ]
+
+        self.TargetUI.is_command_available = False
+
+    def build_command_Misc(self):
+        # I have yet to make the UI for this
+        self.preset_command()
+        self.cmd.type = CommandType.Misc
+        self.cmd.misc.type = MiscType[self.MiscUI.misc_type.get()]
+
+        self.cmd.misc.param = float(self.MiscUI.misc_param_entry.field_value
+                                   )if self.MiscUI.misc_param_entry.field_value != "" else 0.0  
+
+        self.MiscUI.is_command_available = False
+
+    def build_command_JointSlider(self):
+
+        self.preset_command()
+        self.cmd.type = CommandType.Movement
+        self.cmd.motion = Movement()
+        self.cmd.motion.type = MovementType.GoTo
+
+        self.cmd.motion.target = self.JointSliderUI_.get_slider_values()
+
+        self.JointSliderUI_.is_command_available = False
+
+    def preset_command(self):
+
+        self.cmd.type = CommandType.Undefined
+        self.cmd.motion = Movement()
+        self.cmd.misc = Misc()
+        self.trajectory = Trajectory()
+
+        return self.cmd
+
+    # MAINLOOP METHODS
+
     def update_menu(self): ### Could be made more beautiful with a dictionary of methods
 
         if not self.active_frame.is_command_available:
@@ -331,65 +510,7 @@ class MainMenu():
 
             self.is_command_available = True
             self.build_command_JointSlider()
-            return
-
-    def build_command_TargetXYZ(self):
-
-        self.preset_command()
-        self.cmd.command_type = "GoToXYZ"
-        self.cmd.target_xyz = [
-            float(self.TargetXYZUI.entries[0].field_value),
-            float(self.TargetXYZUI.entries[1].field_value),
-            float(self.TargetXYZUI.entries[2].field_value)
-        ]
-        self.cmd.movement_type = "4D"
-        self.cmd.is_approach_given = False
-
-        self.TargetXYZUI.is_command_available = False
-
-    def build_command_Target(self):
-
-        self.preset_command()
-        self.cmd.command_type = "GoToTarget"
-        self.cmd.target = [
-            float(self.TargetUI.entries[0].field_value),
-            float(self.TargetUI.entries[1].field_value),
-            float(self.TargetUI.entries[2].field_value),
-            float(self.TargetUI.entries[3].field_value),
-            float(self.TargetUI.entries[4].field_value)
-        ]
-
-        self.TargetUI.is_command_available = False
-
-    def build_command_Misc(self):
-
-        self.preset_command()
-        self.cmd.command_type = "Misc"
-        # add more stuff here later
-
-        self.MiscUI.is_command_available = False
-
-    def build_command_JointSlider(self):
-
-        self.preset_command()
-        self.cmd.command_type = "GoTo"
-        self.cmd.target = self.JointSliderUI_.get_slider_values()
-
-        self.JointSliderUI_.is_command_available = False
-
-    def preset_command(self):
-
-        self.cmd.command_type = "default"
-        self.cmd.target_xyz = [0.0, 0.0, 0.0]
-        self.cmd.target = [0.0, 0.0, 0.0, 0.0, 0.0]
-        self.cmd.time = 0.0
-        self.cmd.movement_type = "4D"
-        self.cmd.is_approach_given = False
-        self.cmd.approach4d = 0.0
-        self.cmd.approach5d = [0.0, 0.0]
-        self.cmd.path_name = "default"
-
-        return self.cmd
+            return    
 
     def publish_pipeline_start(self): # this allows the publication of garbage (maybe not with the internal validators)
         if self.active_frame == self.MenuGUI:
