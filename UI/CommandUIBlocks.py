@@ -36,9 +36,9 @@ class CommandUITargetXYZ(tk.Frame):
         self.entries = [] # UI.DynamicEntry objects
         self.labels = []  # Tk.Label objects
 
-        self.movement_type = ttk.Combobox(
+        self.solver_type = ttk.Combobox(
             self,
-            values=[x.name for x in MovementType],
+            values=[x.name for x in SolverType],
             state="readonly"
         )
 
@@ -101,7 +101,8 @@ class CommandUITargetXYZ(tk.Frame):
             self.entries.append(e)
             self.labels.append(l)
 
-        self.movement_type.grid(row = 0, column = 2, columnspan=1, sticky="ew", padx=10, pady=10)
+        self.solver_type.grid(row = 0, column = 2, columnspan=1, sticky="ew", padx=10, pady=10)
+        self.solver_type.set("FourDSmart")
         self.param_entry_1.grid(row = 1, column = 2, columnspan=1, sticky="ew", padx=10, pady=10)
         self.param_entry_2.grid(row = 2, column = 2, columnspan=1, sticky="ew", padx=10, pady=10)
 
@@ -207,6 +208,7 @@ class MiscCommandUI(tk.Frame):
         self.misc_param_entry.set_validator(validator = validator_)
 
         self.misc_type.grid(row = 0, column = 0, sticky="ew", padx=10, pady=10)
+        self.misc_type.set("Wait")
         self.misc_type_label.grid(row = 0, column = 1, sticky="ew", padx=10, pady=10)
         self.misc_param_entry.grid(row = 1, column = 1, sticky="ew", padx=10, pady=10)
 
@@ -417,54 +419,55 @@ class MainMenu():
     def build_command_TargetXYZ(self):
 
         self.preset_command()
-        self.cmd.type = CommandType.Movement
-        self.cmd.motion.type = MovementType.GoToXYZ
+        self.cmd.type = CommandType.Movement.value
+        self.cmd.motion.type = MovementType.GoToXYZ.value
         self.cmd.motion = Movement()
 
-        self.cmd.motion.target_xyz = [
-            float(self.TargetXYZUI.entries[0].field_value),
-            float(self.TargetXYZUI.entries[1].field_value),
-            float(self.TargetXYZUI.entries[2].field_value)
-        ]
-
-        self.cmd.solver_type = SolverType[self.TargetXYZUI.movement_type.get()]
+        self.cmd.motion.target_xyz.x = float(self.TargetXYZUI.entries[0].field_value)
+        self.cmd.motion.target_xyz.y = float(self.TargetXYZUI.entries[1].field_value)
+        self.cmd.motion.target_xyz.z = float(self.TargetXYZUI.entries[2].field_value)
+        
+        self.cmd.motion.solver_type = SolverType[self.TargetXYZUI.solver_type.get()].value
 
         self.TargetXYZUI.is_command_available = False
 
     def build_command_Target(self):
 
         self.preset_command()
-        self.cmd.type = CommandType.Movement
+        self.cmd.type = CommandType.Movement.value
         self.cmd.motion = Movement()
-        self.cmd.motion.type = MovementType.GoTo
-
-        self.cmd.motion.target = [
-            float(self.TargetUI.entries[0].field_value),
-            float(self.TargetUI.entries[1].field_value),
-            float(self.TargetUI.entries[2].field_value),
-            float(self.TargetUI.entries[3].field_value),
-            float(self.TargetUI.entries[4].field_value)
-        ]
+        self.cmd.motion.type = MovementType.GoTo.value # to be fixed
+        
+        self.cmd.motion.target.t1 = float(self.TargetUI.entries[0].field_value)
+        self.cmd.motion.target.t2 = float(self.TargetUI.entries[1].field_value)
+        self.cmd.motion.target.t3 = float(self.TargetUI.entries[2].field_value)
+        self.cmd.motion.target.t4 = float(self.TargetUI.entries[3].field_value)
+        self.cmd.motion.target.t5 = float(self.TargetUI.entries[4].field_value)
 
         self.TargetUI.is_command_available = False
 
     def build_command_Misc(self):
         # I have yet to make the UI for this
         self.preset_command()
-        self.cmd.type = CommandType.Misc
-        self.cmd.misc.type = MiscType[self.MiscUI.misc_type.get()]
+        self.cmd.type = CommandType.Misc.value
+        self.cmd.misc.type = MiscType[self.MiscUI.misc_type.get()].value
 
-        self.cmd.misc.param = float(self.MiscUI.misc_param_entry.field_value
-                                   )if self.MiscUI.misc_param_entry.field_value != "" else 0.0  
+        parameter = self.MiscUI.misc_param_entry.get()
 
+        if parameter == "":
+            self.cmd.misc.misc_parameter = 0.0
+        else:
+            self.cmd.misc.misc_parameter = float(parameter)
+
+        
         self.MiscUI.is_command_available = False
 
     def build_command_JointSlider(self):
 
         self.preset_command()
-        self.cmd.type = CommandType.Movement
+        self.cmd.type = CommandType.Movement.value
         self.cmd.motion = Movement()
-        self.cmd.motion.type = MovementType.GoTo
+        self.cmd.motion.type = MovementType.GoTo.value
 
         self.cmd.motion.target = self.JointSliderUI_.get_slider_values()
 

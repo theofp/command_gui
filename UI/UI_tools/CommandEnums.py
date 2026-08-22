@@ -35,4 +35,5 @@ class MiscType(Enum):
     GoHome = 5
     SaveMovement = 6
     Backtrack = 7
+    Start = 8
     

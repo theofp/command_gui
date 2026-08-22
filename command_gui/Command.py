@@ -3,6 +3,7 @@ import tkinter as tk
 from rclpy.node import Node
 from UI.CommandUIBlocks import MainMenu
 from motion_msgs.msg import Command
+from UI.UI_tools.CommandEnums import *
 
 
 class CommandNode(Node):
@@ -30,7 +31,12 @@ class CommandNode(Node):
 
         self.command_publisher = self.create_publisher(
             Command,
-            "UI_command",
+            "GUI_command",
+            10)
+
+        self.emergency_command_publisher = self.create_publisher(
+            Command,
+            "GUI_emergency_command",
             10)
 
         self.timer = self.create_timer(
@@ -52,8 +58,22 @@ class CommandNode(Node):
 
         if self.menu.is_command_available:
 
+            is_emergency = False
             cmd = self.menu.cmd
-            self.command_publisher.publish(cmd)
+
+            if cmd.type == CommandType.Misc.value:
+                if (cmd.misc.type == MiscType.Stop.value or
+                    cmd.misc.type == MiscType.Start.value or
+                    cmd.misc.type == MiscType.Resume.value or
+                    cmd.misc.type == MiscType.WaitAndResume.value):
+
+                    is_emergency = True
+                
+            if is_emergency:
+                self.emergency_command_publisher.publish(cmd)
+            else:
+                self.command_publisher.publish(cmd)
+
             self.menu.is_command_available = False
 
         pass
