@@ -420,8 +420,8 @@ class MainMenu():
 
         self.preset_command()
         self.cmd.type = CommandType.Movement.value
-        self.cmd.motion.type = MovementType.GoToXYZ.value
         self.cmd.motion = Movement()
+        self.cmd.motion.type = MovementType.GoToXYZ.value
 
         self.cmd.motion.target_xyz.x = float(self.TargetXYZUI.entries[0].field_value)
         self.cmd.motion.target_xyz.y = float(self.TargetXYZUI.entries[1].field_value)
@@ -475,7 +475,7 @@ class MainMenu():
 
     def preset_command(self):
 
-        self.cmd.type = CommandType.Undefined
+        self.cmd.type = CommandType.Undefined.value
         self.cmd.motion = Movement()
         self.cmd.misc = Misc()
         self.trajectory = Trajectory()
