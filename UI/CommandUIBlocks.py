@@ -231,7 +231,7 @@ class MiscCommandUI(tk.Frame):
         self.misc_type.grid(row = 0, column = 0, sticky="ew", padx=10, pady=10)
         self.misc_type.set("Wait")
         self.misc_type_label.grid(row = 1, column = 0, sticky="ew", padx=10, pady=10)
-        self.misc_param_entry.grid(row = 0, column = 0, sticky="ew", padx=10, pady=10)
+        self.misc_param_entry.grid(row = 2, column = 0, sticky="ew", padx=10, pady=10)
 
 
     def misc_type_selected(self, event):
