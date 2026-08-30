@@ -36,4 +36,15 @@ class MiscType(Enum):
     SaveMovement = 6
     Backtrack = 7
     Start = 8
-    
+
+class MotionTypeXYZ(Enum):
+
+    Undefined = 0
+    Joint = 2
+    Linear = 4
+
+class MotionType(Enum):
+  
+  Undefined = 0
+  Joint = 1
+  Linear = 3 

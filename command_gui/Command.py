@@ -1,7 +1,7 @@
 import rclpy
 import tkinter as tk
 from rclpy.node import Node
-from UI.CommandUIBlocks import MainMenu
+from UI.MainMenu import MainMenu
 from motion_msgs.msg import Command
 from UI.UI_tools.CommandEnums import *
 
@@ -24,7 +24,14 @@ class CommandNode(Node):
         super().__init__("CommandGUI")
         self.window = tk.Tk()
         self.window.title("Barebones UI")
-        self.window.geometry("900x600")
+        self.window.geometry("800x700")
+
+        self.window.grid_columnconfigure(0, minsize=300, weight=0)
+        self.window.grid_columnconfigure(1, minsize=500, weight=0)
+
+        self.window.grid_rowconfigure(0, minsize=500, weight=0)
+        self.window.grid_rowconfigure(1, minsize=100, weight=0)
+        self.window.grid_rowconfigure(2, minsize=100, weight=0)
 
         self.menu = MainMenu(self.window)
         self.is_alive = True

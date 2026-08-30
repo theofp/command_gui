@@ -1,0 +1,21 @@
+1: 
+    LoadPath: "example"
+
+# The GoTo instruction is for free-motion speed and mode are optional
+2:
+    GoTo:
+        target: {0.5, 0.2, 0.3}
+        speed: 0.1
+        mode: "jog"
+
+# The GoToPath instruction is to move to points in a path file (These are angles)
+3:
+    GoToPathPoint:
+        point: "p1"
+        speed: 0.1
+        mode: "jog"
+
+4: 
+    Wait:
+        time: 100
+# wait in milliseconds
