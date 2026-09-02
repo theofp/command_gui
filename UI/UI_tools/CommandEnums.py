@@ -1,5 +1,7 @@
 from enum import Enum
 
+# General Command Types
+
 class CommandType(Enum):
 
     Undefined = 0
@@ -7,6 +9,23 @@ class CommandType(Enum):
     Misc = 2
     Trajectory = 3
 
+
+# Command Subtypes
+
+class MiscType(Enum):
+
+    Undefined = 0
+    Wait = 1
+    Start = 2
+    Stop = 3 
+    Resume = 4
+    CancelMotion = 5
+    Return = 6
+    Home = 7
+    OpenGripper = 8
+    CloseGripper = 9
+    SavePosition = 10
+    SaveTrajectory = 11
 
 class MovementType(Enum):
 
@@ -16,6 +35,8 @@ class MovementType(Enum):
     GoToL = 3
     GoToXYZL = 4
 
+# MISC
+
 class SolverType(Enum):
 
     Undefined = 0
@@ -24,18 +45,6 @@ class SolverType(Enum):
     FourDSmart = 3
     FiveD = 4
     FiveDSmart = 5
-
-class MiscType(Enum):
-
-    Undefined = 0
-    Wait = 1
-    Stop = 2
-    Resume = 3
-    WaitAndResume = 4
-    GoHome = 5
-    SaveMovement = 6
-    Backtrack = 7
-    Start = 8
 
 class MotionTypeXYZ(Enum):
 

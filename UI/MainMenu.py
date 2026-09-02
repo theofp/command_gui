@@ -9,6 +9,7 @@ from motion_msgs.msg import Misc
 from motion_msgs.msg import Trajectory
 from UI.UI_tools.CommandEnums import *
 from UI.CommandUIBlocks import *
+from UI.CLIUI import CLIUI
 import os
 
 class MainMenu():
@@ -21,10 +22,9 @@ class MainMenu():
     JointSliderButton : tk.Button = None
     MainMenuButton : tk.Button = None
 
-    # Vanity
+    # Permanent Menu (this is a frame to yes)
 
-    MenuImg : tk.PhotoImage = None
-    MenuImgLbl : tk.Label = None
+    PermanentMenu : tk.Frame = None
     
     # Frames
 
@@ -32,6 +32,8 @@ class MainMenu():
     TargetUI : CommandUITarget = None
     MiscUI : MiscCommandUI = None
     JointSliderUI_ : JointSliderUI= None
+
+    CLIUI_ : CLIUI = None
 
     is_command_available : bool = False
     path : str = os.getcwd()
@@ -48,23 +50,11 @@ class MainMenu():
 
         self.root = root
 
-        self.MenuImg = tk.PhotoImage(file=self.menu_img_path)
-        self.MenuImgLbl = tk.Label(
-            master = self.root,
-            image=self.MenuImg,
-            text = "Main Menu",
-            font=("Arial", 20),
-            compound="bottom",
-            borderwidth=3,
-            highlightbackground="blue",
-            highlightcolor="blue",
-            highlightthickness=4
-        )
-
         self.TargetXYZUI = CommandUITargetXYZ(self.root)
         self.TargetUI = CommandUITarget(self.root)
         self.MiscUI = MiscCommandUI(self.root)
         self.JointSliderUI_ = JointSliderUI(self.root)
+        self.CLIUI_ = CLIUI(self.root)
 
         self.MenuGUI = tk.Frame(self.root)
         self.setupMenuGUI()
@@ -74,6 +64,7 @@ class MainMenu():
         self.is_target_ui_active = False
         self.is_misc_ui_active = False
         self.is_joint_slider_ui_active = False
+        self.is_cli_ui_active = False
 
         self.active_frame = self.MenuGUI
 
@@ -90,6 +81,8 @@ class MainMenu():
             font=("Arial", 12),
             command=self.publish_pipeline_start
         )
+
+        self.PermanentMenu = PermanentUI(self.root)
 
         self.build()
 
@@ -125,10 +118,18 @@ class MainMenu():
             command=self.show_joint_slider_ui
         )
 
+        self.CLIUIButton = tk.Button(
+            master = self.MenuGUI,
+            text="Command Line Interface",
+            font=("Arial", 12),
+            command=self.show_cli_ui
+        )
+
         self.TargetXYZButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         self.TargetButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         self.MiscButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         self.JointSliderButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.CLIUIButton.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         self.MenuGUI.is_command_available = False
 
@@ -153,6 +154,10 @@ class MainMenu():
         if self.is_joint_slider_ui_active:
             self.show_joint_slider_ui()
 
+        if self.is_cli_ui_active:
+            self.show_cli_ui()
+            return
+
         else:
             print("No UI is active, nothing to build")
             return      
@@ -164,8 +169,8 @@ class MainMenu():
         self.forget_all_frames()
         self.is_menu_active = True
         self.MenuGUI.grid(row = 0, column = 0, rowspan = 3 , sticky="nsew", padx=10, pady=10)
-        self.MenuImgLbl.grid(row = 0, column = 1, rowspan=3, sticky="nsew", padx=10, pady=10)
-        self.MenuImgLbl.config(text="Main Menu")
+        self.PermanentMenu.grid(row = 0, column = 1, rowspan=3, sticky="nsew", padx=10, pady=10)
+        self.PermanentMenu.set_label_text("Main Menu")
         self.active_frame = self.MenuGUI    
 
     def show_target_xyz_ui(self):
@@ -175,19 +180,19 @@ class MainMenu():
         self.TargetXYZUI.grid(row = 0, column = 0, sticky="nsew", padx=10, pady=10)
         self.MainMenuButton.grid(row = 1, column = 0, sticky="ew", padx=10, pady=10)
         self.PublishButton.grid(row = 2, column = 0, sticky="ew", padx=10, pady=10)
-        self.MenuImgLbl.grid(row = 0, column = 1, rowspan=3, sticky="nsew", padx=10, pady=10)
-        self.MenuImgLbl.config(text="Cartesian Control")
+        self.PermanentMenu.grid(row = 0, column = 1, rowspan = 3, sticky="nsew", padx=10, pady=10)
+        self.PermanentMenu.set_label_text("Cartesian Target")
         self.active_frame = self.TargetXYZUI
 
     def show_target_ui(self):
 
         self.forget_all_frames()
         self.is_target_ui_active = True
-        self.TargetUI.grid(row = 0, column = 0, sticky="nsew", padx=10, pady=10)
+        self.TargetUI.grid(row = 0, column = 0, sticky="nsw", padx=10, pady=10)
         self.MainMenuButton.grid(row = 1, column = 0, sticky="ew", padx=10, pady=10)
         self.PublishButton.grid(row = 2, column = 0, sticky="ew", padx=10, pady=10)
-        self.MenuImgLbl.grid(row = 0, column = 1, rowspan=3, sticky="nsew", padx=10, pady=10)
-        self.MenuImgLbl.config(text="Joint Control")
+        self.PermanentMenu.grid(row = 0, column = 1, rowspan=3, sticky="nsew", padx=10, pady=10)
+        self.PermanentMenu.set_label_text("Joint Target")
         self.active_frame = self.TargetUI
 
     def show_misc_ui(self):
@@ -197,8 +202,8 @@ class MainMenu():
         self.MiscUI.grid(row = 0, column = 0, sticky="nsew", padx=10, pady=10)
         self.MainMenuButton.grid(row = 1, column = 0, sticky="ew", padx=10, pady=10)
         self.PublishButton.grid(row = 2, column = 0, sticky="ew", padx=10, pady=10)
-        self.MenuImgLbl.grid(row = 0, column = 1, rowspan=3, sticky="nsew", padx=10, pady=10)
-        self.MenuImgLbl.config(text="Miscellaneous Commands")
+        self.PermanentMenu.grid(row = 0, column = 1, rowspan=3, sticky="nsew", padx=10, pady=10)
+        self.PermanentMenu.set_label_text("Miscellaneous Commands")
         self.active_frame = self.MiscUI
 
     def show_joint_slider_ui(self):
@@ -208,17 +213,29 @@ class MainMenu():
         self.JointSliderUI_.grid(row = 0, column = 0, sticky="nsew", padx=10, pady=10)
         self.MainMenuButton.grid(row = 1, column = 0, sticky="ew", padx=10, pady=10)
         self.PublishButton.grid(row = 2, column = 0, sticky="ew", padx=10, pady=10)
-        self.MenuImgLbl.grid(row = 0, column = 1, rowspan=3, sticky="nsew", padx=10, pady=10)
-        self.MenuImgLbl.config(text="Joint Sliders")
+        self.PermanentMenu.grid(row = 0, column = 1, rowspan=3, sticky="nsew", padx=10, pady=10)
+        self.PermanentMenu.set_label_text("Joint Slider")
         self.active_frame = self.JointSliderUI_
 
+    def show_cli_ui(self):
+        self.forget_all_frames()
+        self.is_cli_ui_active = True
+        self.CLIUI_.grid(row = 0, column = 0, columnspan = 4, sticky="nsew", padx=10, pady=10)
+        self.MainMenuButton.grid(row = 1, column = 0, sticky="ew", padx=10, pady=10)
+        self.PermanentMenu.disable_image()
+        self.PermanentMenu.grid(row = 1, column = 1, columnspan = 3, sticky="nsew", padx=10, pady=10)
+        self.active_frame = self.CLIUI_
+
     def forget_all_frames(self):
+        if self.active_frame is self.CLIUI_:
+            self.PermanentMenu.enable_image()
 
         self.is_menu_active = False
         self.is_target_xyz_ui_active = False
         self.is_target_ui_active = False
         self.is_misc_ui_active = False
         self.is_joint_slider_ui_active = False
+        self.is_cli_ui_active = False
 
         self.MainMenuButton.grid_forget()
         self.MenuGUI.grid_forget()
@@ -227,7 +244,8 @@ class MainMenu():
         self.MiscUI.grid_forget()
         self.JointSliderUI_.grid_forget()
         self.PublishButton.grid_forget()
-        self.MenuImgLbl.grid_forget()
+        self.PermanentMenu.grid_forget()
+        self.CLIUI_.grid_forget()
 
     # Command Builders
 
@@ -242,7 +260,7 @@ class MainMenu():
         self.cmd.motion.target_xyz.z = float(self.TargetXYZUI.entries[2].field_value)
         
         self.cmd.motion.solver_type = SolverType[self.TargetXYZUI.solver_type.get()].value
-        self.cmd.motion.type = MotionType[self.TargetXYZUI.motion_type.get()].value
+        self.cmd.motion.type = MotionTypeXYZ[self.TargetXYZUI.motion_type.get()].value
 
         self.TargetXYZUI.is_command_available = False
 
@@ -263,7 +281,7 @@ class MainMenu():
         self.TargetUI.is_command_available = False
 
     def build_command_Misc(self):
-        # I have yet to make the UI for this
+
         self.preset_command()
         self.cmd.type = CommandType.Misc.value
         self.cmd.misc.type = MiscType[self.MiscUI.misc_type.get()].value
@@ -289,6 +307,16 @@ class MainMenu():
 
         self.JointSliderUI_.is_command_available = False
 
+    def build_command_permanent_menu_command(self):
+
+        self.preset_command()
+        self.cmd.type = CommandType.Misc.value
+        self.cmd.misc.type = self.PermanentMenu.command_type.value
+
+        self.cmd.misc.misc_parameter = 0.0
+
+        self.PermanentMenu.is_command_available = False
+
     def preset_command(self):
 
         self.cmd.type = CommandType.Undefined.value
@@ -303,6 +331,12 @@ class MainMenu():
     def update_menu(self): ### Could be made more beautiful with a dictionary of methods
 
         if not self.active_frame.is_command_available:
+
+            if self.PermanentMenu.is_command_available:
+
+                self.is_command_available = True
+                self.build_command_permanent_menu_command()
+                return 
 
             self.is_command_available = False
             return
@@ -329,7 +363,7 @@ class MainMenu():
 
             self.is_command_available = True
             self.build_command_JointSlider()
-            return    
+            return   
 
     def publish_pipeline_start(self): # this allows the publication of garbage (maybe not with the internal validators)
         if self.active_frame == self.MenuGUI:

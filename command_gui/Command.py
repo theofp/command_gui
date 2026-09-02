@@ -71,8 +71,7 @@ class CommandNode(Node):
             if cmd.type == CommandType.Misc.value:
                 if (cmd.misc.type == MiscType.Stop.value or
                     cmd.misc.type == MiscType.Start.value or
-                    cmd.misc.type == MiscType.Resume.value or
-                    cmd.misc.type == MiscType.WaitAndResume.value):
+                    cmd.misc.type == MiscType.Resume.value):
 
                     is_emergency = True
                 

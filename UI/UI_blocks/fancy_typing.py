@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter.font import Font
 import os
 import time
-from UI_blocks.fonts import *
+from UI.UI_blocks.fonts import *
 from typing import Any
 
 def Speed2Time(speed : float) -> float:

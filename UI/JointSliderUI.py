@@ -10,6 +10,7 @@ class JointSliderUI(tk.Frame):
     pi2 = pi/2
     deletable = False
     is_command_available : bool = False
+    is_live : bool = False
 
 
     slider_labels_txt = [
@@ -54,6 +55,8 @@ class JointSliderUI(tk.Frame):
             e = DynamicNumberEntry(root = self)
             e.id = i
             e.config(width=10)
+            e.delete(0, tk.END)
+            e.insert(0, "0.0")
 
             def validator_(value, lower=self.l_bound[i], upper=self.u_bound[i], id = i):
                 try:

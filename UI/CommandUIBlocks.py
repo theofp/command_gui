@@ -8,6 +8,7 @@ from motion_msgs.msg import Movement
 from motion_msgs.msg import Misc
 from motion_msgs.msg import Trajectory
 from UI.UI_tools.CommandEnums import *
+import os
 
 
 class CommandUITargetXYZ(tk.Frame):
@@ -37,12 +38,14 @@ class CommandUITargetXYZ(tk.Frame):
         self.labels = []  # Tk.Label objects
 
         self.grid_propagate(False)
+        self.config(width=75, height=50)
 
         self.solver_type = ttk.Combobox(
             self,
             values=[x.name for x in SolverType],
             state="readonly"
         )
+        self.solver_type.config(width=10)
 
         self.motion_type = ttk.Combobox(
             self,
@@ -64,6 +67,7 @@ class CommandUITargetXYZ(tk.Frame):
 
         self.param_entry_1.delete(0, tk.END)
         self.param_entry_1.insert(0, "0.0")
+        self.param_entry_1.config(width=10)
 
         self.param_entry_2 = DynamicNumberEntry(root=self)
 
@@ -79,6 +83,7 @@ class CommandUITargetXYZ(tk.Frame):
 
         self.param_entry_2.delete(0, tk.END)
         self.param_entry_2.insert(0, "0.0")
+        self.param_entry_2.config(width=10)
         
         for i in range(3):
 
@@ -94,6 +99,8 @@ class CommandUITargetXYZ(tk.Frame):
             e = DynamicNumberEntry(root=self)
             e.id = i
             e.config(width=10)
+            e.delete(0, tk.END)
+            e.insert(0, "0.0")
 
             def validator_(value, id = i):
                 try:
@@ -163,6 +170,8 @@ class CommandUITarget(tk.Frame):
             e = DynamicNumberEntry(root=self)
             e.id = i
             e.config(width=10)
+            e.delete(0, tk.END)
+            e.insert(0, "0.0")
 
             def validator_(value, lower=self.l_bound[i], upper=self.u_bound[i], id = i):
                 try:
@@ -193,6 +202,7 @@ class MiscCommandUI(tk.Frame):
     misc_type_label : tk.Label = None
     misc_param_entry : DynamicNumberEntry = None
 
+
     root : tk.Tk = None
 
     def __init__(self, root):
@@ -200,12 +210,17 @@ class MiscCommandUI(tk.Frame):
 
         self.root = root
         self.is_command_available = False
+        self.grid_propagate(False)
+        self.config(width=300, height=50)
+        self.columnconfigure(0, weight=1)
 
         self.misc_type = ttk.Combobox(
             self,
             values=[x.name for x in MiscType],
             state="readonly"
         )
+
+        self.misc_type.config(width=20)
 
         self.misc_type.bind(
             "<<ComboboxSelected>>",
@@ -217,7 +232,12 @@ class MiscCommandUI(tk.Frame):
             text="Undefined"
         )
 
+        self.misc_type_label.config(width=20)
+
         self.misc_param_entry = DynamicNumberEntry(root=self)
+        self.misc_param_entry.config(width=20)
+        self.misc_param_entry.delete(0, tk.END)
+        self.misc_param_entry.insert(0, "0.0")
 
         def validator_(value):
             try:
@@ -248,4 +268,163 @@ class MiscCommandUI(tk.Frame):
             self.misc_param_entry.config(state="disabled")
     # Wait commands et cetera 
 
-  
+class PermanentUI(tk.Frame):
+
+    root : tk.Tk = None
+
+    # IMG
+
+    MenuImgLbl : tk.Label = None
+    MenuImg : tk.PhotoImage = None
+
+    path : str = os.getcwd()
+    image_path : str = os.path.join(path,"src","command_gui","UI", "Images")
+    menu_img_path : str = os.path.join(image_path, "Robot1.png")
+
+    # Buttons
+
+    HomeButton : tk.Button = None
+    StopAndCancelButton : tk.Button = None
+    StartAndResumeButton : tk.Button = None
+
+    # Misc
+
+    is_command_available : bool = False
+    is_stopped : bool = False
+    is_image_disabled : bool = False
+
+    command_type = MiscType.Undefined
+
+    def __init__(self, root : tk):
+        super().__init__()
+        self.root = root
+
+        self.grid_propagate(False)
+        self.config(width=500, height=700)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
+
+        self.rowconfigure(0, weight=4)
+        self.rowconfigure(1, weight=1)
+
+        self.MenuImg = tk.PhotoImage(file=self.menu_img_path)
+        self.MenuImgLbl = tk.Label(
+            master = self,
+            image=self.MenuImg,
+            text = "Main Menu",
+            font=("Arial", 20),
+            compound="bottom",
+            borderwidth=3,
+            highlightbackground="blue",
+            highlightcolor="blue",
+            highlightthickness=4
+        )
+
+        self.MenuImgLbl.config(width=400, height=400)
+
+        self.HomeButton = tk.Button(
+            master = self,
+            text = "Home",
+            command = self.go_home,
+            width=10
+        )
+        self.StopAndCancelButton = tk.Button(
+            master = self,
+            text = "Stop and Cancel",
+            command = self.stop_and_cancel,
+            width=10
+        )
+        self.StartAndResumeButton = tk.Button(
+            master = self,
+            text = "Start and Resume",
+            command = self.start_and_resume,
+            width=10
+        )
+
+        self.update_text()
+
+        self.MenuImgLbl.grid(row = 0, column = 0, columnspan=3, sticky="nsew", padx=25, pady=10)
+
+        self.HomeButton.grid(row = 1, column = 0, sticky="nsew", padx=25, pady=10)
+        self.StopAndCancelButton.grid(row = 1, column = 1, sticky="nsew", padx=25, pady=10)
+        self.StartAndResumeButton.grid(row = 1, column = 2, sticky="nsew", padx=25, pady=10)
+
+    def go_home(self):
+        if not self.is_stopped:
+            self.is_command_available = True
+            self.command_type = MiscType.Home
+
+    def stop_and_cancel(self):
+        if self.is_stopped:
+            self.Cancel()
+        else:
+            self.Stop()
+
+        self.update_text()
+
+    def start_and_resume(self):
+        if self.is_stopped:
+            self.Resume()
+        else:
+            self.Start()
+
+        self.update_text()
+
+    def Stop(self):
+        self.is_stopped = True
+        self.is_command_available = True
+        self.command_type = MiscType.Stop
+
+    def Resume(self):
+        self.is_stopped = False
+        self.is_command_available = True
+        self.command_type = MiscType.Resume
+
+    def Start(self):
+        self.is_stopped = False
+        self.is_command_available = True
+        self.command_type = MiscType.Start
+
+    def Cancel(self):
+        self.is_stopped = False
+        self.is_command_available = True
+        self.command_type = MiscType.CancelMotion
+
+    def update_text(self):
+
+        if self.is_stopped:
+            self.StopAndCancelButton.config(text="Cancel")
+            self.StartAndResumeButton.config(text="Resume")
+        else:
+            self.StopAndCancelButton.config(text="Stop")
+            self.StartAndResumeButton.config(text="Start")
+
+    def set_label_text(self, text : str):
+        self.MenuImgLbl.config(text=text)
+
+    def forget_all(self):
+        self.MenuImgLbl.grid_forget()
+        self.HomeButton.grid_forget()
+        self.StopAndCancelButton.grid_forget()
+        self.StartAndResumeButton.grid_forget()
+
+    def disable_image(self):
+        self.is_image_disabled = True
+        self.forget_all()
+        self.build()
+
+    def enable_image(self):
+        self.is_image_disabled = False
+        self.forget_all()
+        self.build()
+
+    def build(self):
+        i = 0
+        if not self.is_image_disabled:
+            self.MenuImgLbl.grid(row = 0, column = 0, columnspan=3, sticky="nsew", padx=25, pady=10)
+            i = 1
+
+        self.HomeButton.grid(row = i, column = 0, sticky="nsew", padx=25, pady=10)
+        self.StopAndCancelButton.grid(row = i, column = 1, sticky="nsew", padx=25, pady=10)
+        self.StartAndResumeButton.grid(row = i, column = 2, sticky="nsew", padx=25, pady=10)
