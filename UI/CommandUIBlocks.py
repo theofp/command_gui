@@ -67,6 +67,7 @@ class CommandUITargetXYZ(tk.Frame):
 
         self.param_entry_1.delete(0, tk.END)
         self.param_entry_1.insert(0, "0.0")
+        self.param_entry_1.field_value = 0.0
         self.param_entry_1.config(width=10)
 
         self.param_entry_2 = DynamicNumberEntry(root=self)
@@ -83,6 +84,7 @@ class CommandUITargetXYZ(tk.Frame):
 
         self.param_entry_2.delete(0, tk.END)
         self.param_entry_2.insert(0, "0.0")
+        self.param_entry_2.field_value = 0.0
         self.param_entry_2.config(width=10)
         
         for i in range(3):
@@ -101,6 +103,7 @@ class CommandUITargetXYZ(tk.Frame):
             e.config(width=10)
             e.delete(0, tk.END)
             e.insert(0, "0.0")
+            e.field_value = 0.0
 
             def validator_(value, id = i):
                 try:
@@ -172,6 +175,7 @@ class CommandUITarget(tk.Frame):
             e.config(width=10)
             e.delete(0, tk.END)
             e.insert(0, "0.0")
+            e.field_value = 0.0
 
             def validator_(value, lower=self.l_bound[i], upper=self.u_bound[i], id = i):
                 try:
@@ -238,6 +242,7 @@ class MiscCommandUI(tk.Frame):
         self.misc_param_entry.config(width=20)
         self.misc_param_entry.delete(0, tk.END)
         self.misc_param_entry.insert(0, "0.0")
+        self.misc_param_entry.field_value = 0.0
 
         def validator_(value):
             try:
