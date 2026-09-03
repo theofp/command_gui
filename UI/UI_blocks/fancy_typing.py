@@ -22,6 +22,11 @@ class FancyTextBox(tk.Text):
 
     def update_text(self, text : str, font : Font = None, speed : float = 1, is_fancy : bool = False):
 
+        original_state = self.cget("state")
+
+        if original_state == "disabled":
+            self.config(state="normal")
+
         if font is not None:
             self.font = font
 
@@ -41,8 +46,15 @@ class FancyTextBox(tk.Text):
             self.insert("end", char)
             self.update()
             time.sleep(pause)
+
+        self.config(state=original_state)
     
     def append_text(self, text : str, font : Font = None, speed : float = 1):
+
+        original_state = self.cget("state")
+
+        if original_state == "disabled":
+            self.config(state="normal")
 
         if font is not None:
             self.font = font
@@ -57,8 +69,15 @@ class FancyTextBox(tk.Text):
             self.insert("end", char)
             self.update()
             time.sleep(pause)
+
+        self.config(state=original_state)
         
     def fancy_clear(self, speed : float = 1):
+
+        original_state = self.cget("state")
+
+        if original_state == "disabled":
+            self.config(state="normal")
 
         pause = Speed2Time(speed)
 
@@ -73,6 +92,8 @@ class FancyTextBox(tk.Text):
             self.update()
             sze = len(self.get("1.0", "end"))
             time.sleep(pause)
+
+        self.config(state=original_state)
 
     def set_font(self, font : Font):
         self.font = font

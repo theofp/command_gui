@@ -352,6 +352,7 @@ class PermanentUI(tk.Frame):
 
     def go_home(self):
         if not self.is_stopped:
+            print("Home command issued")
             self.is_command_available = True
             self.command_type = MiscType.Home
 
@@ -372,21 +373,25 @@ class PermanentUI(tk.Frame):
         self.update_text()
 
     def Stop(self):
+        print("Stop command issued")
         self.is_stopped = True
         self.is_command_available = True
         self.command_type = MiscType.Stop
 
     def Resume(self):
+        print("Resume command issued")
         self.is_stopped = False
         self.is_command_available = True
         self.command_type = MiscType.Resume
 
     def Start(self):
+        print("Start command issued")
         self.is_stopped = False
         self.is_command_available = True
         self.command_type = MiscType.Start
 
     def Cancel(self):
+        print("Cancel command issued")
         self.is_stopped = False
         self.is_command_available = True
         self.command_type = MiscType.CancelMotion

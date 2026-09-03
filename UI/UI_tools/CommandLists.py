@@ -5,10 +5,14 @@ import inspect
 from . import CommandEnums
 from .CommandEnums import *
 
+PreDict = {
+    "MiscType": CommandType.Misc,
+    "MovementType": CommandType.Movement,
+}
 
-Commands = {
-	command.value: enum.__name__
-	for _, enum in inspect.getmembers(CommandEnums, inspect.isclass)
+CommandDict = {
+	command.name: PreDict[enum.__name__]
+	for enum in list([MiscType, MovementType])
 	if issubclass(enum, Enum)
 	for command in enum
 }
@@ -16,24 +20,24 @@ Commands = {
 CommandStructure = { # Uninplemented File Loads
     
     MiscType.Undefined.name : None,
-    MiscType.Wait : [float],
-    MiscType.Start : None,
-    MiscType.Stop : None,
-    MiscType.Resume : None,
-    MiscType.CancelMotion : None,
-    MiscType.Return : None,
-    MiscType.Home : None,
-    MiscType.OpenGripper : None,
-    MiscType.CloseGripper : None,
-    MiscType.SavePosition : None,
-    MiscType.SaveTrajectory : None,
+    MiscType.Wait.name : [[float]],
+    MiscType.Start.name : None,
+    MiscType.Stop.name : None,
+    MiscType.Resume.name : None,
+    MiscType.CancelMotion.name : None,
+    MiscType.Return.name : None,
+    MiscType.Home.name : None,
+    MiscType.OpenGripper.name : None,
+    MiscType.CloseGripper.name : None,
+    MiscType.SavePosition.name : None,
+    MiscType.SaveTrajectory.name : None,
 
-    MovementType.GoTo : [[float, float, float, float, float]],
-    MovementType.GoToXYZ : [[float, float, float],
-                             [float, float, float, SolverType],
-                             [float, float, float, SolverType, float]],
-    MovementType.GoToL : [float, float, float],
-    MovementType.GoToXYZL : [[float, float, float, float],
-                              [float, float, float, float, SolverType],
-                              [float, float, float, float, SolverType, float]]
+    MovementType.GoTo.name : [[float, float, float, float, float]],
+    MovementType.GoToXYZ.name : [[float, float, float],
+                                [float, float, float, SolverType],
+                                [float, float, float, SolverType, float]],
+    MovementType.GoToL.name : [float, float, float],
+    MovementType.GoToXYZL.name : [[float, float, float, float],
+                                 [float, float, float, float, SolverType],
+                                 [float, float, float, float, SolverType, float]]
     }

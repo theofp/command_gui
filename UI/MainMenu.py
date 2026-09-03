@@ -338,6 +338,13 @@ class MainMenu():
                 self.build_command_permanent_menu_command()
                 return 
 
+            if self.active_frame == self.CLIUI_:
+            
+                if (len(self.CLIUI_.command_queue) > 0 and not self.is_command_available):
+                    self.is_command_available = True
+                    self.cmd = self.CLIUI_.command_queue.pop(0)
+                    return
+
             self.is_command_available = False
             return
 
@@ -363,7 +370,9 @@ class MainMenu():
 
             self.is_command_available = True
             self.build_command_JointSlider()
-            return   
+            return  
+
+
 
     def publish_pipeline_start(self): # this allows the publication of garbage (maybe not with the internal validators)
         if self.active_frame == self.MenuGUI:
