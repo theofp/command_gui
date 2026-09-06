@@ -1,0 +1,39 @@
+base_frame:
+  orientation:
+  - 0
+  - 0
+  - 90
+  position:
+  - 0
+  - 0
+  - 0.1
+home_position:
+  j1: 0.0
+  j2: 0.0
+  j3: 0.0
+  j4: 0.0
+  j5: 0.0
+joint_limits:
+  j1:
+    max: 1.4
+    min: -1.4
+  j2:
+    max: 1.35
+    min: -1.35
+  j3:
+    max: 1.4
+    min: -1.4
+  j4:
+    max: 1.4
+    min: -1.4
+  j5:
+    max: 1.4
+    min: -1.4
+linear_IK_params:
+  D: 0.0
+  I: 0.5
+  P: 5.0
+links:
+  l1: 1.0
+  l2: 1.0
+  l3: 0.2

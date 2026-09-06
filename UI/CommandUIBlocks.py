@@ -17,6 +17,7 @@ class CommandUITargetXYZ(tk.Frame):
 
     is_command_available : bool = False
 
+    # TO BE REPLACED BY A CONFIG FILE
     pi = 3.1415
     pi2 = pi/2
 
@@ -198,14 +199,12 @@ class CommandUITarget(tk.Frame):
         self.motion_type.set("Joint")
 
 class MiscCommandUI(tk.Frame):
-    # i don't yet know all the commands this should encompass
 
     is_command_available : bool = False
 
     misc_type : ttk.Combobox = None
     misc_type_label : tk.Label = None
     misc_param_entry : DynamicNumberEntry = None
-
 
     root : tk.Tk = None
 

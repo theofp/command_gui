@@ -39,5 +39,9 @@ CommandStructure = { # Uninplemented File Loads
     MovementType.GoToL.name : [float, float, float],
     MovementType.GoToXYZL.name : [[float, float, float, float],
                                  [float, float, float, float, SolverType],
-                                 [float, float, float, float, SolverType, float]]
+                                 [float, float, float, float, SolverType, float]],
+    MovementType.Offset.name : [[float, float, float, float, float]],
+    MovementType.OffsetXYZ.name : [[float, float, float],
+                                   [float, float, float, SolverType],
+                                   [float, float, float, SolverType, float]],
     }

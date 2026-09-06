@@ -34,6 +34,8 @@ class MovementType(Enum):
     GoToXYZ = 2
     GoToL = 3
     GoToXYZL = 4
+    Offset = 5
+    OffsetXYZ = 6
 
 # MISC
 

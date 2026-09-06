@@ -140,8 +140,10 @@ class LabelAndEntry(tk.Frame):
 
         if label_text is not None:
             self.label["text"] = label_text 
+
         if entry_text is not None:
             self.entry.insert("0", f"{entry_text}")
+
         self.label_columnspan = label_columnspan
         self.entry_columnspan = entry_columnspan
         self.label_rowspan = label_rowspan
@@ -176,10 +178,13 @@ class LabelAndText(tk.Frame):
     def __init__(self, root : tk.Tk, label_text : str = None, text_text : str = None, do_build : bool = True, label_columnspan : int = 1, text_columnspan : int = 1, label_rowspan : int = 1, text_rowspan : int = 1, *args, **kwargs):
         super().__init__()
         self.root = root
+
         if label_text is not None:
             self.label = tk.Label(self, text = label_text, *args, **kwargs)
+
         if text_text is not None:
             self.text = tk.Text(self, text = text_text, *args, **kwargs)
+
         self.label_columnspan = label_columnspan
         self.text_columnspan = text_columnspan
         self.label_rowspan = label_rowspan
@@ -189,11 +194,14 @@ class LabelAndText(tk.Frame):
             self.build()
 
     def build(self):
+
         self.label.grid(row = 0, column = 0, sticky="ew", padx = 10, columnspan=self.label_columnspan, rowspan=self.label_rowspan)
         self.text.grid(row = 0, column = self.label_columnspan + 1, sticky="ew", padx = 10, columnspan=self.text_columnspan, rowspan=self.text_rowspan)
 
     def resize(self, label_columnspan : int = 1, text_columnspan : int = 1, do_build : bool = True):   
+
         self.label_columnspan = label_columnspan
         self.text_columnspan = text_columnspan
+        
         if do_build:
             self.build()
