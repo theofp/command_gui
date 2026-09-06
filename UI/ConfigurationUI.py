@@ -228,6 +228,8 @@ class ConfigUI(tk.Frame):
 
         WriteButton.grid(row = 7, column = 2, columnspan = 2, padx = 5, pady = 5)
 
+        self.Distributor.publish_config()
+
 
     def update_config(self, do_publish = True):
         # Update the configuration from the entries

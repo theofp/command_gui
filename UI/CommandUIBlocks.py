@@ -281,6 +281,10 @@ class PermanentUI(tk.Frame):
     MenuImgLbl : tk.Label = None
     MenuImg : tk.PhotoImage = None
 
+    # Reference 
+
+    parent = None
+
     path : str = os.getcwd()
     image_path : str = os.path.join(path,"src","command_gui","UI", "Images")
     menu_img_path : str = os.path.join(image_path, "Robot1.png")
@@ -299,9 +303,12 @@ class PermanentUI(tk.Frame):
 
     command_type = MiscType.Undefined
 
-    def __init__(self, root : tk):
+    def __init__(self, root : tk, parent = None):
         super().__init__()
         self.root = root
+
+        if parent is not None:
+            self.parent = parent
 
         self.grid_propagate(False)
         self.config(width=500, height=700)
@@ -393,6 +400,7 @@ class PermanentUI(tk.Frame):
         self.is_stopped = False
         self.is_command_available = True
         self.command_type = MiscType.Start
+        self.parent.ConfigurationUI.Distributor.publish_config() 
 
     def Cancel(self):
         print("Cancel command issued")

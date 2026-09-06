@@ -94,7 +94,7 @@ class MainMenu():
             command=self.publish_pipeline_start
         )
 
-        self.PermanentMenu = PermanentUI(self.root)
+        self.PermanentMenu = PermanentUI(self.root, self)
 
         self.build()
 
