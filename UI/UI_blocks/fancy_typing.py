@@ -1,9 +1,13 @@
+# Standard Library Imports
 import tkinter as tk 
 from tkinter.font import Font
+from typing import Any
 import os
 import time
+
+# Local Imports
 from UI.UI_blocks.fonts import *
-from typing import Any
+
 
 def Speed2Time(speed : float) -> float:
     return 1/(20*speed)

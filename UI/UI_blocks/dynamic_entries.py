@@ -1,7 +1,10 @@
+# Standard Library Imports
+from typing import Callable, Any, Union
 import tkinter as tk 
 import os
+
+# Local Imports
 from UI.alphabet_support import SpecialChars, SpecialCharsNoNums
-from typing import Callable, Any, Union
 
 class DynamicTextEntry(tk.Text):
 

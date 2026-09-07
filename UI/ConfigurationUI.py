@@ -1,8 +1,14 @@
+# Standard Library Imports
 import tkinter as tk
+
+# ROS Imports
+import rclpy
+
+# Local Imports
 from UI.UI_blocks.dynamic_entries import DynamicNumberEntry
 from UI.UI_tools.field_validators import *
 from Configuration.Distribution import ParamDistributor
-import rclpy
+
 
 class ConfigUI(tk.Frame):
 

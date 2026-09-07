@@ -1,14 +1,19 @@
+# Standard Library Imports
+import os
 import tkinter as tk
 from tkinter import ttk
+
+# Local Imports
 from UI.UI_blocks.dynamic_entries import DynamicNumberEntry
 from UI.UI_tools.field_validators import *
 from UI.JointSliderUI import JointSliderUI
+from UI.UI_tools.CommandEnums import *
+
+# ROS Messages
 from motion_msgs.msg import Command
 from motion_msgs.msg import Movement
 from motion_msgs.msg import Misc
 from motion_msgs.msg import Trajectory
-from UI.UI_tools.CommandEnums import *
-import os
 
 
 class CommandUITargetXYZ(tk.Frame):

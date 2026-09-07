@@ -1,7 +1,8 @@
-
+# Standard Library Imports
 from enum import Enum
 import inspect
 
+# Local Imports
 from . import CommandEnums
 from .CommandEnums import *
 

@@ -1,10 +1,16 @@
-import rclpy
+# Standard Library Imports
 import tkinter as tk
-from rclpy.node import Node
-from UI.MainMenu import MainMenu
-from motion_msgs.msg import Command
-from UI.UI_tools.CommandEnums import *
 
+# ROS Imports
+import rclpy
+from rclpy.node import Node
+
+# ROS Messages
+from motion_msgs.msg import Command
+
+# Local Imports
+from UI.MainMenu import MainMenu
+from UI.UI_tools.CommandEnums import *
 
 class CommandNode(Node):
 
@@ -16,6 +22,10 @@ class CommandNode(Node):
     window : tk.Tk = None
     menu : MainMenu = None
     UI = None
+
+    # Misc
+
+    skip_cicles : int = 0
 
     #cmd tuple
 
@@ -54,8 +64,12 @@ class CommandNode(Node):
     def timer_callback(self): # hijacked the update loop!
 
         self.window.update()
-        self.menu.update_menu()
-        self.checkPublishStatus()
+        if self.skip_cicles > 0:
+            self.skip_cicles -= 1
+            return
+        else:
+            self.menu.update_menu()
+            self.checkPublishStatus()
 
         # This does not work when the window is closed but ironically that makes it throw an error that leads to killing the process
         if not self.window.winfo_exists(): 
@@ -74,7 +88,11 @@ class CommandNode(Node):
                     cmd.misc.type == MiscType.Resume.value):
 
                     is_emergency = True
-                
+
+                    if cmd.misc.type == MiscType.Start.value:
+                        self.menu.ConfigurationUI.Distributor.publish_config()
+                        self.skip_cicles = 5 # Give Time for config to be published before starting the robot                    
+
             if is_emergency:
                 self.emergency_command_publisher.publish(cmd)
             else:

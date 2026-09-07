@@ -1,13 +1,16 @@
+# Standard Library Imports
 import tkinter as tk
+from tkinter import ttk
+import os
 
-from pyparsing import line
-from tables import Enum
-from UI.UI_blocks.fancy_typing import FancyTextBox
+# Ros Messages
 from motion_msgs.msg import Command
 from motion_msgs.msg import Movement
 from motion_msgs.msg import Misc
 from motion_msgs.msg import Trajectory
-import inspect
+
+# Local Imports
+from UI.UI_blocks.fancy_typing import FancyTextBox
 from UI.UI_tools.CommandEnums import*
 from UI.UI_tools.CommandLists import CommandDict, CommandStructure
 
@@ -35,8 +38,16 @@ class CLIUI(tk.Frame):
     cli_entry_label : tk.Label = None
     cli_output_label : tk.Label = None
 
-    ClearButton : tk.Button = None
-    RunButton : tk.Button = None
+    cli_file_selector : ttk.Combobox = None #
+
+    ClearOutputButton : tk.Button = None
+    ClearInputButton : tk.Button = None  #
+    LoadFileButton : tk.Button = None #
+    RunButton : tk.Button = None 
+
+    file_name_list : list[str] = []
+    file_directory_path : str = None
+    selected_file : str = None
 
     def __init__(self, root : tk.Tk):
 
@@ -44,6 +55,9 @@ class CLIUI(tk.Frame):
         self.root = root
 
         self.grid_propagate(False)
+
+        self.cli_file_selector = ttk.Combobox(self, values=["self.file_name_list"])
+        self.file_selector_update()
 
         self.cli_entry = FancyTextBox(self, text_dimensions=(10, 40))
         self.cli_entry.config(width=40, height=5)
@@ -64,7 +78,7 @@ class CLIUI(tk.Frame):
             font=("Arial", 12)
         )
 
-        self.ClearButton = tk.Button(
+        self.ClearOutputButton = tk.Button(
             self,
             text="Clear Output",
             command=self.clear_output
@@ -75,14 +89,33 @@ class CLIUI(tk.Frame):
             text="Run Command",
             command=self.read_entry
         )
-        self.cli_entry_label.grid(row=0, column=0, sticky="w", padx=10, pady=10)
-        self.cli_output_label.grid(row=0, column=1, sticky="w", padx=10, pady=10)
 
-        self.cli_entry.grid(row=1, column=0, rowspan=2, sticky="nsew", padx=10, pady=10)
-        self.cli_output.grid(row=1, column=1, columnspan=2, sticky="nsew", padx=10, pady=10)
+        self.LoadFileButton = tk.Button(
+            self,
+            text="Load File",
+            command=self.load_selected_file
+        )
 
-        self.ClearButton.grid(row=2, column=1, sticky="ew", padx=10, pady=10)
-        self.RunButton.grid(row=2, column=2, sticky="ew", padx=10, pady=10)
+        self.ClearInputButton = tk.Button(
+            self,
+            text="Clear Input",
+            command=self.clear_input
+        )
+
+        # ROW 0
+        self.cli_entry_label.grid(row=0, column=0, columnspan = 3, sticky="w", padx=10, pady=10)
+        self.cli_output_label.grid(row=0, column=3, columnspan = 3, sticky="w", padx=10, pady=10)
+
+        # ROW 1-2
+        self.cli_entry.grid(row=1, column=0, columnspan = 3, rowspan=2, sticky="nsew", padx=10, pady=10)
+        self.cli_output.grid(row=1, column=3, columnspan=3, sticky="nsew", padx=10, pady=10)
+
+        # ROW 3
+        self.cli_file_selector.grid(row=3, column=0, columnspan = 2, sticky="ew", padx=10, pady=10)
+        self.LoadFileButton.grid(row=3, column=2, sticky="ew", padx=10, pady=10)
+        self.ClearInputButton.grid(row=3, column=3, sticky="ew", padx=10, pady=10)
+        self.ClearOutputButton.grid(row=3, column=4, sticky="ew", padx=10, pady=10)
+        self.RunButton.grid(row=3, column=5, sticky="ew", padx=10, pady=10)
 
         self.cli_output.append_text(text = "Welcome to the Command Line Interface!\n", speed = 5.0)
 
@@ -167,7 +200,6 @@ class CLIUI(tk.Frame):
 
         self.cli_output.append_text(text = f"\nCommand populated: {command_type.name}", speed = 5.0)
         self.command_queue.append(self.command)
-
 
     def populate_movement_command(self, command : Command, command_subtype, command_structure , args : list):
 
@@ -290,4 +322,39 @@ class CLIUI(tk.Frame):
     def clear_output(self):
         self.cli_output.fancy_clear(5.0)
 
-            
+    def clear_input(self):
+        self.cli_entry.fancy_clear(10.0)
+
+    def file_selector_update(self, directory_path : str = None):
+
+        if directory_path is None:
+
+            directory_path = os.getcwd()
+            directory_path = os.path.join(directory_path, "src", "command_gui", "command_gui", "instructionFiles")
+
+        self.file_directory_path = directory_path
+        self.file_name_list = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
+
+        self.cli_file_selector['values'] = self.file_name_list
+
+    def load_selected_file(self):
+
+        self.selected_file = self.cli_file_selector.get()
+
+        if self.selected_file is None:
+            self.cli_output.append_text(text = "No file selected.\n", speed = 5.0)
+            return
+
+        file_path = os.path.join(self.file_directory_path, self.selected_file)
+
+        try:
+            with open(file_path, 'r') as f:
+
+                content = f.read()
+                self.clear_input()
+                self.cli_entry.append_text(text = content, speed = 5.0)
+                self.cli_output.append_text(text = f"Loaded file: {self.selected_file}\n", speed = 5.0)
+
+        except Exception as e:
+
+            self.cli_output.append_text(text = f"\nError loading file: {str(e)}\n", speed = 5.0)

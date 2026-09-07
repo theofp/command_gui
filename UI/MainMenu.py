@@ -1,17 +1,22 @@
+# Standard Library Imports
 import tkinter as tk
 from tkinter import ttk
+import os
+
+# Local Imports
 from UI.UI_blocks.dynamic_entries import DynamicNumberEntry
 from UI.UI_tools.field_validators import *
 from UI.JointSliderUI import JointSliderUI
-from motion_msgs.msg import Command
-from motion_msgs.msg import Movement
-from motion_msgs.msg import Misc
-from motion_msgs.msg import Trajectory
 from UI.UI_tools.CommandEnums import *
 from UI.CommandUIBlocks import *
 from UI.CLIUI import CLIUI
 from UI.ConfigurationUI import ConfigUI
-import os
+
+# ROS Messages
+from motion_msgs.msg import Command
+from motion_msgs.msg import Movement
+from motion_msgs.msg import Misc
+from motion_msgs.msg import Trajectory
 
 class MainMenu():
 
@@ -24,12 +29,10 @@ class MainMenu():
     MainMenuButton : tk.Button = None
     ConfigButton : tk.Button = None
 
-    # Permanent Menu (this is a frame to yes)
+    # Permanent Menu (this is a frame too yes)
 
     PermanentMenu : tk.Frame = None
 
-
-    
     # Frames
 
     TargetXYZUI : CommandUITargetXYZ = None

@@ -1,8 +1,15 @@
+# Standard Library Imports
+import tkinter as tk
+
+# Local Imports
+from UI.JointSliderUI import JointSliderUI
+
+# ROS Imports
 import rclpy
 from rclpy.node import Node
-from UI.JointSliderUI import JointSliderUI
-import tkinter as tk
 from rclpy.clock import Time
+
+# ROS Messages
 from std_msgs.msg import Float32MultiArray
 
 class JointSliderNode(Node):

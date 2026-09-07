@@ -93,6 +93,12 @@ class ParamDistributor(Node):
         joint_config.j3.min = self.config["joint_limits"]["j3"]["min"]
         joint_config.j3.max = self.config["joint_limits"]["j3"]["max"]
 
+        joint_config.j4.min = self.config["joint_limits"]["j4"]["min"]
+        joint_config.j4.max = self.config["joint_limits"]["j4"]["max"]
+
+        joint_config.j5.min = self.config["joint_limits"]["j5"]["min"]
+        joint_config.j5.max = self.config["joint_limits"]["j5"]["max"]
+
         self.joint_config.publish(joint_config)
 
     def publish_linear_config(self):

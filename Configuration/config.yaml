@@ -32,7 +32,7 @@ joint_limits:
 linear_IK_params:
   D: 0.0
   I: 0.5
-  P: 5.0
+  P: 5000.0
 links:
   l1: 1.0
   l2: 1.0
