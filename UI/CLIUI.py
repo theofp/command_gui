@@ -12,7 +12,7 @@ from motion_msgs.msg import Trajectory
 # Local Imports
 from UI.UI_blocks.fancy_typing import FancyTextBox
 from UI.UI_tools.CommandEnums import*
-from UI.UI_tools.CommandLists import CommandDict, CommandStructure
+from UI.UI_tools.CommandLists import CommandDict, CommandStructure, LogicCommandList
 
 
 def Cleanup(text : str):
@@ -119,7 +119,6 @@ class CLIUI(tk.Frame):
 
         self.cli_output.append_text(text = "Welcome to the Command Line Interface!\n", speed = 5.0)
 
-
     def preset_command(self):
         command = Command()
         command.type = CommandType.Undefined.value
@@ -129,15 +128,17 @@ class CLIUI(tk.Frame):
 
         return command
         
-
     def read_entry(self):
 
         text = self.cli_entry.get("1.0", tk.END)
         lines = text.splitlines()
-        self.cli_output.append_text(text = f"\nReading entry: {text}", speed = 5.0)
+        self.cli_output.append_text(text = "\nReading entry", speed = 5.0)
 
-        for i in range(len(lines)):
-            line = lines[i]
+        compiled_lines = self.compile(lines)
+        print(f"Compiled lines: {compiled_lines}")
+
+        for i in range(len(compiled_lines)):
+            line = compiled_lines[i]
             if line.strip() == "":
                 continue
             
@@ -147,14 +148,14 @@ class CLIUI(tk.Frame):
 
         line = Cleanup(line)
         parts = line.split(" ")
-        self.cli_output.append_text(text = f"\nInterpreting command: {line}", speed = 5.0)
+        #self.cli_output.append_text(text = f"\nInterpreting command: {line}", speed = 5.0)
 
         for part in parts:
             if part == "":
                 parts.remove(part)
 
         if len(parts) == 0:
-            self.cli_output.append_text(text = "\nNo command entered.", speed = 5.0)
+            #self.cli_output.append_text(text = "\nNo command entered.", speed = 5.0)
             return
 
         string_command = parts[0]
@@ -172,7 +173,7 @@ class CLIUI(tk.Frame):
         
         self.command = self.preset_command()
 
-        self.cli_output.append_text(text = f"\nCommand type: {command_type}, Command subtype: {command_subtype}\n", speed = 5.0)
+        #self.cli_output.append_text(text = f"\nCommand type: {command_type}, Command subtype: {command_subtype}\n", speed = 5.0)
 
         match(command_type):
         
@@ -198,7 +199,7 @@ class CLIUI(tk.Frame):
                 self.cli_output.append_text(text = f"\nUnknown command type: {command_type}", speed = 5.0   )
                 return
 
-        self.cli_output.append_text(text = f"\nCommand populated: {command_type.name}", speed = 5.0)
+        #self.cli_output.append_text(text = f"\nCommand populated: {command_type.name}", speed = 5.0)
         self.command_queue.append(self.command)
 
     def populate_movement_command(self, command : Command, command_subtype, command_structure , args : list):
@@ -358,3 +359,70 @@ class CLIUI(tk.Frame):
         except Exception as e:
 
             self.cli_output.append_text(text = f"\nError loading file: {str(e)}\n", speed = 5.0)
+
+    def compile(self, uncompiled_lines : list[str]):
+
+        compiled_lines : list[str] = []
+        i = 0
+
+        while i < len(uncompiled_lines):
+            line = Cleanup(uncompiled_lines[i])
+            parts = line.split(" ")
+
+            if len(parts) == 0:
+                continue
+
+            string_command = parts[0]
+
+            if string_command in LogicCommandList.keys():
+                command_type = LogicCommandList[string_command]
+
+                match command_type:
+
+                    case LogicCommands.Loop:
+                        LoopCount = 1
+                        i += 1
+                        nested_lines = []
+
+                        try:
+                            loop_iterations = int(parts[1])
+
+                        except:
+                            raise Exception("No iteration count provided for Loop command")
+
+                        while (LoopCount > 0 and i < len(uncompiled_lines)):
+                                
+                            test_line = Cleanup(uncompiled_lines[i])
+                            test_parts = test_line.split(" ")
+                            test_string_command = test_parts[0]
+
+                            # Accounts for nested loops
+                            if test_string_command == "EndLoop":
+                                LoopCount -= 1
+                                if LoopCount == 0:
+                                    break
+
+                            elif test_string_command == "Loop":
+                                LoopCount += 1
+                            
+                            nested_lines.append(uncompiled_lines[i])
+
+                            i += 1
+
+                        if LoopCount > 0:
+                            raise Exception("Loop not closed with EndLoop")
+                        
+                        output_lines = self.compile(nested_lines)
+                        compiled_lines.extend(output_lines * int(parts[1]))
+                i += 1
+            else:
+                compiled_lines.append(line)
+                i += 1
+                                
+                            
+
+
+
+
+        return compiled_lines
+

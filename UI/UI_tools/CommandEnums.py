@@ -59,3 +59,8 @@ class MotionType(Enum):
   Undefined = 0
   Joint = 1
   Linear = 3 
+
+class LogicCommands(Enum):
+
+    Loop = 1
+    EndLoop = 2

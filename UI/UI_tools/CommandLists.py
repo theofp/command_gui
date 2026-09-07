@@ -46,3 +46,6 @@ CommandStructure = { # Uninplemented File Loads
                                    [float, float, float, SolverType],
                                    [float, float, float, SolverType, float]],
     }
+
+LogicCommandList = {"Loop" : LogicCommands.Loop, 
+                    "EndLoop" : LogicCommands.EndLoop}
